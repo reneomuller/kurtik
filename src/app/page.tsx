@@ -14,7 +14,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
     <>
       <p className="text-sm font-medium text-clay">{CLUB_NAME}</p>
       <h1 className="mt-1 text-2xl font-bold">Rezervujte si kurt</h1>
-      <Suspense fallback={<p className="mt-6 text-muted">Načítám termíny…</p>}>
+      <Suspense fallback={<p className="mt-6 text-muted">Načítáme termíny…</p>}>
         <SlotPicker searchParams={searchParams} />
       </Suspense>
     </>

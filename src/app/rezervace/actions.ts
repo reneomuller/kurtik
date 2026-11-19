@@ -42,26 +42,26 @@ export async function bookSlot(
   const errors: BookingFormState["errors"] = {};
 
   if (!slot || !isBookableSlot(slot.date, slot.time, getPragueNow())) {
-    errors.slot = "Tento termín už nejde rezervovat. Vyberte prosím jiný.";
+    errors.slot = "Tento termín už nejde rezervovat. Vyberte si prosím jiný.";
   }
 
   const nameLength = Array.from(values.name).length;
   if (nameLength === 0) {
-    errors.name = "Vyplňte prosím jméno nebo přezdívku.";
+    errors.name = "Zadejte jméno nebo přezdívku.";
   } else if (nameLength < NAME_MIN) {
-    errors.name = `Jméno musí mít aspoň ${NAME_MIN} znaky.`;
+    errors.name = `Zadejte jméno nebo přezdívku, aspoň ${NAME_MIN} znaky.`;
   } else if (nameLength > NAME_MAX) {
-    errors.name = `Jméno může mít nejvýš ${NAME_MAX} znaků.`;
+    errors.name = `Zkraťte jméno na nejvýš ${NAME_MAX} znaků.`;
   }
 
   if (values.email === "") {
-    errors.email = "Vyplňte prosím e-mail.";
+    errors.email = "Zadejte svůj e-mail.";
   } else if (values.email.length > EMAIL_MAX || !EMAIL_PATTERN.test(values.email)) {
-    errors.email = "Zkontrolujte e-mail, má vypadat třeba jako jana@example.com.";
+    errors.email = "Zadejte e-mail ve tvaru jana@example.com.";
   }
 
   if (values.phone.length > PHONE_MAX) {
-    errors.phone = `Telefon může mít nejvýš ${PHONE_MAX} znaků.`;
+    errors.phone = `Zkraťte telefon na nejvýš ${PHONE_MAX} znaků, nebo ho nechte prázdný.`;
   }
 
   if (!slot || Object.keys(errors).length > 0) {
