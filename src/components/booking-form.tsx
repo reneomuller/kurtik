@@ -78,8 +78,8 @@ export function BookingForm({ slot }: { slot: Slot }) {
       {state.errors.slot && (
         <p role="alert" className="rounded-xl border border-clay bg-white p-4 font-medium text-clay">
           {state.errors.slot}{" "}
-          <Link href="/" className="underline">
-            Vybrat jiný termín
+          <Link href={`/?den=${slot.date}`} className="underline">
+            Zpět na výběr termínů
           </Link>
         </p>
       )}

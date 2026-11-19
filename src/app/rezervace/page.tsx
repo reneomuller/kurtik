@@ -12,7 +12,7 @@ type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export default function BookingPage({ searchParams }: PageProps<"/rezervace">) {
   return (
-    <Suspense fallback={<p className="text-muted">Načítám termín…</p>}>
+    <Suspense fallback={<p className="text-muted">Načítáme termín…</p>}>
       <BookingContent searchParams={searchParams} />
     </Suspense>
   );
@@ -29,8 +29,8 @@ async function BookingContent({ searchParams }: { searchParams: SearchParams }) 
       <>
         <h1 className="text-2xl font-bold">Tento termín už nejde rezervovat</h1>
         <p className="mt-3">
-          Rezervovat můžete jen termíny, které ještě nezačaly, a to na dnes a dalších {DAYS_AHEAD}{" "}
-          dní.
+          Rezervovat můžete na dnes a dalších {DAYS_AHEAD} dní. Termíny, které už začaly, v nabídce
+          nejsou.
         </p>
         <Link
           href="/"
@@ -45,7 +45,7 @@ async function BookingContent({ searchParams }: { searchParams: SearchParams }) 
   return (
     <>
       <Link href={`/?den=${slot.date}`} className="inline-flex min-h-11 items-center text-clay underline">
-        ← Zpět na výběr termínu
+        ← Zpět na výběr termínů
       </Link>
       <h1 className="mt-2 mb-4 text-2xl font-bold">Dokončete rezervaci</h1>
       <SlotSummary slot={slot} withPrice />
