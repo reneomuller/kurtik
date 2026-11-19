@@ -27,6 +27,29 @@ export async function getTakenSlots(date: string): Promise<Slot[]> {
   }));
 }
 
+// Taken slots for several consecutive days in one RPC call (the day picker shows free counts).
+export async function getTakenSlotsForDays(days: string[]): Promise<Slot[]> {
+  if (days.length === 0) return [];
+  const supabase = getSupabase();
+  if (!supabase) return days.flatMap(getDemoTakenSlots);
+
+  const { data, error } = await supabase
+    .rpc('kurtik_taken_slots')
+    .gte('slot_date', days[0])
+    .lte('slot_date', days[days.length - 1]);
+  if (error) {
+    console.error('Loading taken slots failed, code:', error.code || 'unknown');
+    throw new Error('Loading taken slots failed');
+  }
+  return ((data ?? []) as TakenSlotRow[])
+    .map((row) => ({
+      court: row.court,
+      date: row.slot_date,
+      time: row.start_time.slice(0, 5),
+    }))
+    .filter((slot) => days.includes(slot.date));
+}
+
 // 'taken': someone else booked the slot first (one booking per slot, first one wins).
 export type CreateBookingResult = 'saved' | 'taken' | 'failed';
 

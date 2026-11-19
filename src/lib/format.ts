@@ -65,3 +65,29 @@ export function formatTimeRange(start: string, end: string): string {
 export function formatPrice(amount: number): string {
   return priceFormat.format(amount);
 }
+
+/** '2026-11-21' → 'so' */
+export function formatWeekdayShort(date: string): string {
+  return weekdayShortFormat.format(toDate(date));
+}
+
+/** '2026-11-21' → '21. 11.' */
+export function formatDayMonth(date: string): string {
+  return dayMonthFormat.format(toDate(date));
+}
+
+const pluralRules = new Intl.PluralRules(LOCALE);
+
+/** 1 → '1 volný', 3 → '3 volné', 0 or 5+ → '5 volných' */
+export function formatFreeCount(count: number): string {
+  const category = pluralRules.select(count);
+  const word = category === 'one' ? 'volný' : category === 'few' ? 'volné' : 'volných';
+  return `${count} ${word}`;
+}
+
+const numberFormat = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 });
+
+/** 300, 400 → '300–400 Kč' */
+export function formatPriceRange(from: number, to: number): string {
+  return `${numberFormat.format(from)}–${formatPrice(to)}`;
+}

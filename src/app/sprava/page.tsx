@@ -36,15 +36,18 @@ function formatBookingCount(count: number): string {
 
 export default function AdminPage() {
   return (
-    <>
-      <p className="rounded-xl border border-clay bg-white p-3 text-sm">
+    <div className="mx-auto max-w-[640px]">
+      <p className="flex gap-2.5 rounded-2xl border border-ball-dark/60 bg-[#f7fbdc] p-3.5 text-sm text-ball-ink">
+        <span aria-hidden="true" className="font-bold">
+          !
+        </span>
         Ukázkové zabezpečení jen pro výuku. Ostrá aplikace potřebuje skutečné přihlášení.
       </p>
-      <p className="mt-5 text-sm font-medium text-clay">{CLUB_NAME}</p>
+      <p className="mt-6 text-sm font-semibold text-green-mid">{CLUB_NAME}</p>
       <Suspense fallback={<p className="mt-6 text-muted">Načítám správu…</p>}>
         <AdminContent />
       </Suspense>
-    </>
+    </div>
   );
 }
 
@@ -55,8 +58,8 @@ async function AdminContent() {
   if (mode === "unconfigured") {
     return (
       <>
-        <h1 className="mt-1 text-2xl font-bold">Správa klubu</h1>
-        <p className="mt-6 rounded-xl border border-line bg-white p-4">Správa není nastavená.</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight">Správa klubu</h1>
+        <p className="mt-6 rounded-2xl border border-line bg-card p-4 shadow-card">Správa není nastavená.</p>
       </>
     );
   }
@@ -64,7 +67,7 @@ async function AdminContent() {
   if (!(await hasAdminSession())) {
     return (
       <>
-        <h1 className="mt-1 text-2xl font-bold">Správa klubu</h1>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight">Správa klubu</h1>
         <PinForm />
         {mode === "demo" && (
           <p className="mt-4 text-sm text-muted">V ukázkovém režimu je PIN {DEMO_PIN}.</p>
@@ -79,51 +82,58 @@ async function AdminContent() {
 
   return (
     <>
-      <h1 className="mt-1 text-2xl font-bold">Dnešní rezervace</h1>
+      <h1 className="mt-1 text-2xl font-bold tracking-tight">Dnešní rezervace</h1>
       <p className="mt-1 text-lg">{formatDayWithYear(today)}</p>
       <p className="mt-1 text-muted">
         {taken.length > 0 ? formatBookingCount(taken.length) : "Zatím žádná rezervace."}
       </p>
       <p className="mt-3 text-sm">Jména vidí jen správce v Supabase.</p>
-      <table className="mt-3 w-full table-fixed border-separate border-spacing-1.5">
-        <caption className="sr-only">Obsazenost kurtů dnes</caption>
-        <thead>
-          <tr>
-            <th scope="col" className="w-14">
-              <span className="sr-only">Čas</span>
-            </th>
-            {COURTS.map((court) => (
-              <th key={court.id} scope="col" className="pb-1 text-sm font-semibold">
-                {court.name}
+      <div className="mt-4 rounded-2xl border border-line bg-card p-3 shadow-card sm:p-5">
+        <table className="w-full table-fixed border-separate border-spacing-1.5">
+          <caption className="sr-only">Obsazenost kurtů dnes</caption>
+          <thead>
+            <tr>
+              <th scope="col" className="w-12">
+                <span className="sr-only">Čas</span>
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {getSlotTimes().map((time) => (
-            <tr key={time}>
-              <th scope="row" className="text-left font-medium tabular-nums">
-                {formatTime(time)}
-              </th>
-              {COURTS.map((court) =>
-                takenKeys.has(`${court.id} ${time}`) ? (
-                  <td key={court.id}>
-                    <div className="flex min-h-11 items-center justify-center rounded-xl bg-clay text-sm font-semibold text-white">
-                      Obsazeno
-                    </div>
-                  </td>
-                ) : (
-                  <td key={court.id}>
-                    <div className="flex min-h-11 items-center justify-center rounded-xl border border-line bg-white text-sm text-muted">
-                      Volno
-                    </div>
-                  </td>
-                ),
-              )}
+              {COURTS.map((court) => (
+                <th key={court.id} scope="col" className="pb-1">
+                  <div className="rounded-xl border border-line bg-paper px-1 py-2 text-sm font-bold">
+                    {court.name}
+                  </div>
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {getSlotTimes().map((time) => (
+              <tr key={time}>
+                <th
+                  scope="row"
+                  className="pr-1 text-right text-sm font-semibold tabular-nums"
+                >
+                  {formatTime(time)}
+                </th>
+                {COURTS.map((court) =>
+                  takenKeys.has(`${court.id} ${time}`) ? (
+                    <td key={court.id}>
+                      <div className="flex min-h-11 items-center justify-center rounded-xl bg-green text-sm font-bold text-white">
+                        Obsazeno
+                      </div>
+                    </td>
+                  ) : (
+                    <td key={court.id}>
+                      <div className="flex min-h-11 items-center justify-center rounded-xl border border-line bg-paper text-sm text-muted">
+                        Volno
+                      </div>
+                    </td>
+                  ),
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }
