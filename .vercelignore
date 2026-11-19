@@ -1,0 +1,3 @@
+# Klíče se na Vercel nenahrávají; proměnné jsou v nastavení projektu.
+.env*
+!.env.example

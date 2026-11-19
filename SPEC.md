@@ -32,6 +32,7 @@ Jedna tabulka `kurtik_bookings` v Supabase: kurt (1–3), datum, čas začátku,
 | Adresy stránek | `/` výběr termínu (`/?den=2026-11-20` jiný den), `/rezervace?kurt=2&den=2026-11-19&cas=18:00` formulář, `/rezervace/hotovo?kurt=2&den=2026-11-19&cas=18:00` potvrzení; jméno ani e-mail nikdy v adrese |
 | Zařízení | hlavní je mobil na výšku; na počítači stejné rozložení uprostřed, šířka nejvýš 640 px |
 | Bez klíčů k databázi | ukázkový režim: předem obsazené termíny každý den Kurt 1 v 18:00, Kurt 2 v 19:00 a Kurt 3 v 8:00; nové rezervace drží jen paměť serveru (po restartu zmizí), takže zarezervovaný termín je pak obsazený; nahoře lišta „Ukázkový režim: rezervace se neukládají.“ |
+| Správa pro klub | `/sprava` pod PINem (ukázkové zabezpečení): dnešní obsazenost kurtů bez jmen; jména a e-maily vidí jen správce v Supabase |
 | Dvě rezervace na stejný termín | platí rezervace, která přišla první; druhý hráč uvidí „Tento termín si právě zarezervoval někdo jiný. Vyberte si prosím jiný.“ a tlačítko „Zpět na výběr termínů“ (rozhodla třída v kroku P3) |
 
 ## Kritéria přijetí
@@ -45,7 +46,7 @@ Jedna tabulka `kurtik_bookings` v Supabase: kurt (1–3), datum, čas začátku,
 - [ ] `npm run build` projde bez chyb.
 
 ## Mimo rozsah (teď ne)
-Platby (později třeba platební odkaz Stripe), přihlášení a účty, rušení a změny rezervací, správa pro klub (přijde jako samostatný krok), posílání e-mailů a SMS, víc klubů, opakované rezervace, členské ceny.
+Platby (později třeba platební odkaz Stripe), přihlášení a účty, rušení a změny rezervací, posílání e-mailů a SMS, víc klubů, opakované rezervace, členské ceny.
 
 ## Jazyk a formáty
 - Česky, s diakritikou, vykáme. Přátelský klubový tón, bez vykřičníků a bez anglických slov.

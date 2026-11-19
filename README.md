@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kurtík · rezervace kurtů pro TK Míčkovice
 
-## Getting Started
+Výuková aplikace z Bloku 4 (MUP, čtvrtek 19. 11. 2026). TK Míčkovice je smyšlený klub. Hráč v mobilu vidí volné kurty na dnes a dalších 6 dní, klepne na termín, vyplní přezdívku a e-mail (stačí vymyšlený) a rezervace se uloží do Supabase.
 
-First, run the development server:
+Co stavíme a proč, je v `SPEC.md`. Pravidla pro Claude Code jsou v `CLAUDE.md`. Nasazení na Vercel popisuje `DEPLOY-NOTES.md`.
+
+## Historie po krocích
+Každý krok živé stavby je jeden commit. Historie je sama o sobě výklad:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git log --oneline --graph
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Tag | Stav po kroku |
+|---|---|
+| `p0` | kostra Next.js, SPEC.md, CLAUDE.md, schéma databáze |
+| `p1` | výběr termínu, formulář a potvrzení na ukázkových datech (lišta „Ukázkový režim“) |
+| `p2` | rezervace se ukládají do Supabase |
+| `p3` | jeden termín = jedna rezervace (rozhodnutí třídy A: platí ta, která přišla první) |
+| `streams` | po merge proudů B (správa pod PINem) a C (přidat do kalendáře, texty v jednom tónu) |
+| `final` | po opravě nálezu z recenze (limit pokusů na PIN), patička a poznámky k nasazení |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Databáze
+Projekt Supabase je sdílený s jinými aplikacemi, proto má Kurtík vlastní jména:
+- tabulka `public.kurtik_bookings` (kurt 1–3, datum, čas začátku, jméno, e-mail, telefon, čas vytvoření; jeden termín smí mít jen jednu rezervaci),
+- funkce `public.kurtik_taken_slots()`, která vrací jen obsazené termíny (kurt, datum, čas), žádná jména.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Návštěvník smí rezervace jen vkládat (dnes až +6 dní, ne do minulosti) a číst je nesmí. Aplikace nemá secret key, proto stránka `/sprava` ukazuje jen dnešní obsazenost kurtů. **Jména a e-maily vidí jen správce přímo v Supabase.**
 
-## Learn More
+Popis tabulky je v `supabase/schema.sql`. V projektu pro hodinu už všechno je, soubor znovu nespouštějte.
 
-To learn more about Next.js, take a look at the following resources:
+## Spuštění na vlastním počítači
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm ci
+cp .env.example .env.local   # doplňte URL a publishable key ze Supabase a vlastní ADMIN_PIN
+npm run dev                   # http://localhost:3000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Bez `.env.local` běží aplikace v ukázkovém režimu: nahoře lišta „Ukázkový režim: rezervace se neukládají.“, předem obsazené Kurt 1 v 18:00, Kurt 2 v 19:00 a Kurt 3 v 8:00 a `/sprava` přijme PIN `1234`.
 
-## Deploy on Vercel
+Proměnné `NEXT_PUBLIC_…` se do aplikace vkládají při buildu. Po jejich změně je potřeba nový build (na Vercelu Redeploy).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Testovací rezervace z noci
+Při přípravě vznikla **jedna** skutečná rezervace, aby se ověřilo ukládání a hláška při dvojí rezervaci:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Kurt | Den | Čas | Jméno | E-mail |
+|---|---|---|---|---|
+| Kurt 3 | středa 25. 11. 2026 | 21:00 | Test před hodinou | test@example.com |
+
+Ten termín je proto v aplikaci „Obsazeno“. Můžete ho nechat (studentům nevadí), nebo smazat: Supabase → Table Editor → `kurtik_bookings` → zaškrtnout řádek → Delete.
+
+## Pro projektor a po hodině
+Na plátno jen dotaz bez e-mailů (SQL Editor, uložený dotaz):
+
+```sql
+select court, slot_date, start_time, name
+from public.kurtik_bookings
+order by created_at desc;
+```
+
+Po hodině smažte data studentů (jen tuhle tabulku, projekt je sdílený):
+
+```sql
+delete from public.kurtik_bookings;
+```
+
+`ADMIN_PIN` je jen v `.env.local` a v nastavení Vercelu, nikdy v gitu ani na plátně. Ukázkové zabezpečení pro výuku; ostrá správa by potřebovala skutečné přihlášení (Supabase Auth).
