@@ -27,12 +27,21 @@ export async function getTakenSlots(date: string): Promise<Slot[]> {
   }));
 }
 
-// Returns false when the booking could not be saved.
-export async function createBooking(booking: NewBooking): Promise<boolean> {
+// 'taken': someone else booked the slot first (one booking per slot, first one wins).
+export type CreateBookingResult = 'saved' | 'taken' | 'failed';
+
+// Postgres unique_violation, raised by the bookings_one_per_slot constraint.
+const UNIQUE_VIOLATION = '23505';
+
+export async function createBooking(booking: NewBooking): Promise<CreateBookingResult> {
   const supabase = getSupabase();
   if (!supabase) {
+    const isTaken = getDemoTakenSlots(booking.date).some(
+      (slot) => slot.court === booking.court && slot.time === booking.time,
+    );
+    if (isTaken) return 'taken';
     demoBookings().push({ court: booking.court, date: booking.date, time: booking.time });
-    return true;
+    return 'saved';
   }
 
   // No .select() after insert: the public role may insert but not read bookings.
@@ -44,11 +53,12 @@ export async function createBooking(booking: NewBooking): Promise<boolean> {
     email: booking.email,
     phone: booking.phone,
   });
+  if (error?.code === UNIQUE_VIOLATION) return 'taken';
   if (error) {
     console.error('Saving booking failed, code:', error.code || 'unknown');
-    return false;
+    return 'failed';
   }
-  return true;
+  return 'saved';
 }
 
 // Demo data: taken every day in demo mode.

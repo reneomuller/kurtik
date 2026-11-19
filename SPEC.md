@@ -32,7 +32,7 @@ Jedna tabulka `kurtik_bookings` v Supabase: kurt (1–3), datum, čas začátku,
 | Adresy stránek | `/` výběr termínu (`/?den=2026-11-20` jiný den), `/rezervace?kurt=2&den=2026-11-19&cas=18:00` formulář, `/rezervace/hotovo?kurt=2&den=2026-11-19&cas=18:00` potvrzení; jméno ani e-mail nikdy v adrese |
 | Zařízení | hlavní je mobil na výšku; na počítači stejné rozložení uprostřed, šířka nejvýš 640 px |
 | Bez klíčů k databázi | ukázkový režim: předem obsazené termíny každý den Kurt 1 v 18:00, Kurt 2 v 19:00 a Kurt 3 v 8:00; nové rezervace drží jen paměť serveru (po restartu zmizí), takže zarezervovaný termín je pak obsazený; nahoře lišta „Ukázkový režim: rezervace se neukládají.“ |
-| Dvě rezervace na stejný termín | {{CO_KDYŽ_JE_OBSAZENO}} (rozhodne třída v kroku P3) |
+| Dvě rezervace na stejný termín | platí rezervace, která přišla první; druhý hráč uvidí „Tento termín si právě zarezervoval někdo jiný. Vyberte si prosím jiný.“ a tlačítko „Zpět na výběr termínů“ (rozhodla třída v kroku P3) |
 
 ## Kritéria přijetí
 - [ ] Na mobilu (šířka 390 px) je mřížka časů × 3 kurty pro vybraný den bez vodorovného posouvání.

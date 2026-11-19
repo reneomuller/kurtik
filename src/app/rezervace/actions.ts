@@ -13,7 +13,14 @@ const PHONE_MAX = 30;
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export type BookingFormState = {
-  errors: { slot?: string; name?: string; email?: string; phone?: string; form?: string };
+  errors: {
+    slot?: string;
+    taken?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    form?: string;
+  };
   values: { name: string; email: string; phone: string };
 };
 
@@ -61,13 +68,19 @@ export async function bookSlot(
     return { errors, values };
   }
 
-  const saved = await createBooking({
+  const result = await createBooking({
     ...slot,
     name: values.name,
     email: values.email,
     phone: values.phone || null,
   });
-  if (!saved) {
+  if (result === "taken") {
+    return {
+      errors: { taken: "Tento termín si právě zarezervoval někdo jiný. Vyberte si prosím jiný." },
+      values,
+    };
+  }
+  if (result === "failed") {
     return {
       errors: { form: "Rezervaci se nepodařilo uložit. Zkuste to prosím znovu." },
       values,

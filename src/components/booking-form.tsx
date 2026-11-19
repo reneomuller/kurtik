@@ -52,6 +52,23 @@ function Field({ name, label, type, autoComplete, placeholder, state }: FieldPro
 export function BookingForm({ slot }: { slot: Slot }) {
   const [state, formAction, pending] = useActionState(bookSlot, initialState);
 
+  // Someone else got the slot first; the form can no longer succeed.
+  if (state.errors.taken) {
+    return (
+      <div className="mt-6 rounded-xl border border-clay bg-white p-4">
+        <p role="alert" className="font-medium text-clay">
+          {state.errors.taken}
+        </p>
+        <Link
+          href={`/?den=${slot.date}`}
+          className="mt-4 flex min-h-11 w-full items-center justify-center rounded-xl bg-clay px-4 font-semibold text-white hover:bg-clay/90"
+        >
+          Zpět na výběr termínů
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <form action={formAction} noValidate className="mt-6 space-y-4">
       <input type="hidden" name="kurt" value={slot.court} />

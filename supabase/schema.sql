@@ -1,11 +1,12 @@
 -- Hodina 19. 11. 2026: tabulka i funkce už ve sdíleném projektu Supabase jsou
 -- (kurtik_bookings, kurtik_taken_slots, včetně unikátního omezení). Soubor je popis, znovu ho nespouštějte.
--- Kurtík · TK Míčkovice · databáze (stav PŘED krokem P3)
+-- Kurtík · TK Míčkovice · databáze (stav PO kroku P3)
 -- Spuštěno v Supabase → SQL Editor. Popis a bezpečnostní model: viz komentáře níže.
 -- Tabulka kurtik_bookings: court 1–3, slot_date 'YYYY-MM-DD', start_time 'HH:MM' (pražský čas),
 -- name, email, phone (nepovinný), created_at.
 -- Anonymní návštěvník smí jen INSERT; obsazené termíny čte přes rpc kurtik_taken_slots().
--- Unikátní omezení na (court, slot_date, start_time) zatím NENÍ – přijde v kroku P3.
+-- Jeden termín = jedna rezervace: unikátní omezení kurtik_bookings_one_per_slot (krok P3).
+-- Existující databázi převede supabase/p3-jeden-termin.sql.
 
 -- =====================================================================
 -- ČÁST 1 · před hodinou
@@ -27,7 +28,9 @@ create table if not exists public.kurtik_bookings (
                 and email ~ '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$'
               ),
   phone       text        check (phone is null or char_length(phone) <= 30),
-  created_at  timestamptz not null default now()
+  created_at  timestamptz not null default now(),
+  -- platí rezervace, která přišla první; druhá na stejný termín skončí chybou 23505
+  constraint kurtik_bookings_one_per_slot unique (court, slot_date, start_time)
 );
 
 comment on table public.kurtik_bookings is
