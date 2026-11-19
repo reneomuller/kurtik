@@ -13,7 +13,7 @@ const PHONE_MAX = 30;
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export type BookingFormState = {
-  errors: { slot?: string; name?: string; email?: string; phone?: string };
+  errors: { slot?: string; name?: string; email?: string; phone?: string; form?: string };
   values: { name: string; email: string; phone: string };
 };
 
@@ -61,11 +61,17 @@ export async function bookSlot(
     return { errors, values };
   }
 
-  await createBooking({
+  const saved = await createBooking({
     ...slot,
     name: values.name,
     email: values.email,
     phone: values.phone || null,
   });
+  if (!saved) {
+    return {
+      errors: { form: "Rezervaci se nepodařilo uložit. Zkuste to prosím znovu." },
+      values,
+    };
+  }
   redirect(`/rezervace/hotovo?${slotQuery(slot)}`);
 }

@@ -85,6 +85,12 @@ export function BookingForm({ slot }: { slot: Slot }) {
       />
       <Field name="phone" label="Telefon (nepovinný)" type="tel" autoComplete="tel" state={state} />
 
+      {state.errors.form && (
+        <p role="alert" className="rounded-xl border border-clay bg-white p-4 font-medium text-clay">
+          {state.errors.form}
+        </p>
+      )}
+
       <button
         type="submit"
         disabled={pending}
